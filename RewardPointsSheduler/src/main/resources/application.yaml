@@ -1,0 +1,6 @@
+server:
+  port: 8082
+
+
+ispring.data.access.url: http://localhost:8083
+rewardpoints.management.service.url: http://localhost:8081
