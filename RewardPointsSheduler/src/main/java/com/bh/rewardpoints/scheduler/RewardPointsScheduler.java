@@ -9,9 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,9 +21,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.client.RestTemplate;
 
 import com.bh.rewardpoints.model.ISpringUser;
@@ -33,18 +33,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Component
-//@RestController
-//@RequestMapping("/v1")
-//@CrossOrigin
+@Named
 public class RewardPointsScheduler {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
-	@Autowired
+	@Inject
 	private RestTemplate restTemplate;
 
-	@Autowired
+	@Inject
 	private ObjectMapper objectMapper;
 
 	@Value("${ispring.data.access.url}")
@@ -53,13 +50,11 @@ public class RewardPointsScheduler {
 	@Value("${rewardpoints.management.service.url}")
 	private String rewardPointsMngSrvUrl;
 
-	//@Scheduled(cron = "* * * 1 * ?")   // Cron for every month 1st 
-	@Scheduled(cron = "*/30 * * * * ?")   // Cron for every 30 seconds
-	@GetMapping("/testScheduler")
+	@Scheduled(cron = "* * * 1 * ?")   // Cron for every month 1st 
+	//@Scheduled(cron = "*/30 * * * * ?")   // Cron for every 30 seconds for testing purpose
 	public void cronJobSch() {
 		logger.info("Scheduler started ......");
 		try {
-			//ResponseEntity<?> responseEntity = restTemplate.exchange(rwpointsApiBaseUrl + "/rewardpoints/users", HttpMethod.GET, entity, List.class);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 			Date now = new Date();
 			String strDate = sdf.format(now);
@@ -76,8 +71,6 @@ public class RewardPointsScheduler {
 				logger.info("iSpringUsersList size : {}, ", iSpringUsersList.size());
 				List<User> usersFinalList = new ArrayList<>();
 				if(!CollectionUtils.isEmpty(iSpringUsersList)) {
-					//iSpringUsersList.stream().forEach(user -> {
-					int i = 0;
 						for(ISpringUser iSpringUser: iSpringUsersList) {
 						Map<String, String> map = new HashMap<>();
 						map.put("userId",  iSpringUser.getUserId());
@@ -98,15 +91,10 @@ public class RewardPointsScheduler {
 									logger.info("User : {} ", userUpdate);
 								}
 							} catch (JsonProcessingException e) {
-								e.printStackTrace();
+							logger.info("Exception in Parsing the JSON");
 							}
 						}
-						if(i == 5) {
-							break;
-						}
-						i++;
 					}
-					//});
 				}
 				if(!CollectionUtils.isEmpty(usersFinalList)) {
 					String iSpringUserJson = objectMapper.writeValueAsString(usersFinalList);
