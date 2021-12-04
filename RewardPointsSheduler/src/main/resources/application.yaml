@@ -4,3 +4,5 @@ server:
 
 ispring.data.access.url: http://localhost:8083
 rewardpoints.management.service.url: http://localhost:8081
+
+scheduler.cron.expression: "* * * 1 * ?"
