@@ -5,4 +5,8 @@ server:
 ispring.data.access.url: http://localhost:8083
 rewardpoints.management.service.url: http://localhost:8081
 
+# Cron will be executed every month 1st
 scheduler.cron.expression: "* * * 1 * ?"
+
+# Cron will be executed for every 30 seconds for local testing purpose
+#scheduler.cron.expression: "*/30 * * * * ?"
